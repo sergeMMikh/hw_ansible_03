@@ -76,3 +76,57 @@
         group: "{{ ansible_user_gid }}"
         backup: true
       notify: Start vector service
+
+- name: Install Lighthouse
+  hosts: lighthouse
+  vars:
+    nodejs_version: "16.x"  # Версия Node.js LTS
+  tasks:
+    - name: Install dependencies
+      become: true
+      ansible.builtin.yum:
+        name: 
+          - gcc-c++
+          - make
+          - curl
+        state: present
+
+    - name: Install Node.js
+      become: true
+      ansible.builtin.shell: |
+        curl -sL https://rpm.nodesource.com/setup_{{ nodejs_version }} | bash -
+      args:
+        warn: false
+
+    - name: Install Node.js package
+      become: true
+      ansible.builtin.yum:
+        name: nodejs
+        state: present
+
+    - name: Install Lighthouse via npm
+      become: true
+      ansible.builtin.npm:
+        name: lighthouse
+        global: yes
+
+    - name: Create Lighthouse directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/lighthouse
+        state: directory
+        mode: '0755'
+
+    - name: Copy Lighthouse configuration
+      become: true
+      ansible.builtin.template:
+        src: lighthouse-config.json.j2
+        dest: /etc/lighthouse/config.json
+        mode: '0644'
+
+  handlers:
+    - name: Restart Lighthouse (if necessary)
+      become: true
+      ansible.builtin.service:
+        name: lighthouse
+        state: restarted
