@@ -10,29 +10,41 @@
         name: clickhouse-server
         state: restarted
   tasks:
-    - block:
+    - name: Download Clickhouse packages
+      block:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
             url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
             dest: "/tmp/{{ item }}-{{ clickhouse_version }}.rpm"
+            mode: "0644"
           with_items: "{{ clickhouse_packages }}"
       rescue:
         - name: Get clickhouse distrib (rescue mode)
           ansible.builtin.get_url:
             url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
             dest: "/tmp/clickhouse-common-static-{{ clickhouse_version }}.rpm"
+            mode: "0644"
+    - name: Check if RPM files exist
+      ansible.builtin.command: ls -l /tmp/*.rpm
+      register: rpm_files
+      ignore_errors: true
+
+    - debug:
+        var: rpm_files.stdout_lines
+
     - name: Install clickhouse packages
       become: true
       ansible.builtin.yum:
-        name:
-          - /tmp/clickhouse-common-static-{{ clickhouse_version }}.rpm
-          - /tmp/clickhouse-client-{{ clickhouse_version }}.rpm
-          - /tmp/clickhouse-server-{{ clickhouse_version }}.rpm
+        name: "/tmp/{{ item }}-{{ clickhouse_version }}.rpm"
         disable_gpg_check: true
+      loop:
+        - clickhouse-common-static
+        - clickhouse-client
+        - clickhouse-server
       notify: Start clickhouse service
     - name: Flush handlers
-      meta: flush_handlers
-    - name: Create database
+      ansible.builtin.meta: flush_handlers
+    - name: Create Clickhouse database
       become: true
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
@@ -52,6 +64,7 @@
       ansible.builtin.get_url:
         url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.x86_64.rpm"
         dest: "./vector-{{ vector_version }}-1.x86_64.rpm"
+        mode: "0644" # Установка безопасных прав доступа
     - name: Install vector packages
       become: true
       ansible.builtin.yum:
@@ -80,23 +93,43 @@
 - name: Install Lighthouse
   hosts: lighthouse
   vars:
-    nodejs_version: "16.x"  # Версия Node.js LTS
+    nodejs_version: "16.x" # Версия Node.js LTS
   tasks:
     - name: Install dependencies
       become: true
       ansible.builtin.yum:
-        name: 
+        name:
           - gcc-c++
           - make
-          - curl
         state: present
+
+    - name: Install curl and remove conflicting curl-minimal
+      become: true
+      ansible.builtin.shell: |
+        dnf install -y curl --allowerasing
+      args:
+        warn: false # Правильное использование аргумента warn с shell
+
+    - name: Clean up dnf cache
+      become: true
+      ansible.builtin.shell: |
+        dnf clean all
+      args:
+        warn: false
+
+    - name: Update system packages
+      become: true
+      ansible.builtin.yum:
+        name: "*"
+        state: latest
 
     - name: Install Node.js
       become: true
       ansible.builtin.shell: |
-        curl -sL https://rpm.nodesource.com/setup_{{ nodejs_version }} | bash -
+        set -o pipefail && curl -sL https://rpm.nodesource.com/setup_{{ nodejs_version }} | bash -
       args:
         warn: false
+      changed_when: false # Устанавливает задачу как не изменяющую ничего
 
     - name: Install Node.js package
       become: true
@@ -106,23 +139,23 @@
 
     - name: Install Lighthouse via npm
       become: true
-      ansible.builtin.npm:
+      community.general.npm:
         name: lighthouse
-        global: yes
+        global: true
 
     - name: Create Lighthouse directory
       become: true
       ansible.builtin.file:
         path: /etc/lighthouse
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Copy Lighthouse configuration
       become: true
       ansible.builtin.template:
         src: lighthouse-config.json.j2
         dest: /etc/lighthouse/config.json
-        mode: '0644'
+        mode: "0644"
 
   handlers:
     - name: Restart Lighthouse (if necessary)
