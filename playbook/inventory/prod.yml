@@ -4,20 +4,20 @@ all:
     vector:
       hosts:
         first:
-          ansible_host: 3.79.149.62
-          ansible_ssh_user: ec2-user
-          ansible_ssh_private_key_file: "~/.ssh/1207_4_Crystall.pem"
+          ansible_host: 192.168.33.11
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: "/home/smm/test_ansible_02/playbook/ppk_1.pem"
 
     clickhouse:
       hosts:
         second:
-          ansible_host: 3.124.189.255
-          ansible_ssh_user: ec2-user
-          ansible_ssh_private_key_file: "~/.ssh/1207_4_Crystall.pem"
+          ansible_host: 192.168.33.12
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: "/home/smm/test_ansible_02/playbook/ppk_2.pem"
 
     lighthouse:
       hosts:
         third:
-          ansible_host: 3.65.205.156
-          ansible_ssh_user: ec2-user
-          ansible_ssh_private_key_file: "~/.ssh/1207_4_Crystall.pem"
+          ansible_host: 192.168.33.13
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: "/home/smm/test_ansible_02/playbook/ppk_3.pem"
