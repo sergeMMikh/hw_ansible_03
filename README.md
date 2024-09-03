@@ -19,6 +19,13 @@
 
 ### Решение
 
-
+1. Резальтат поиска ошибо к при помощи `ansible-lint site.yml`
+     <img src="images/Task_lint.png" alt="Task_lint.png" width="700" height="auto">
+4. Результат запуска `ansible-playbook site.yml -i inventory/prod.yml --check`
+   <img src="images/Task_check_1.png" alt="Task_check_1.png" width="700" height="auto">
+6. Результат запуска `ansible-playbook site.yml -i inventory/prod.yml --diff`
+   <img src="images/Task_diff.png" alt="Task_diff.png" width="700" height="auto">
+6. Результат повторного запуска `ansible-playbook site.yml -i inventory/prod.yml --diff`
+   <img src="images/Task_check_2.png" alt="Task_check_2.png" width="700" height="auto">
 
 ---
