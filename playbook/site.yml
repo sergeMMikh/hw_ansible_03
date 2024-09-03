@@ -93,6 +93,14 @@
     - group_vars/lightHouse/varslh.yml
   
   tasks:
+    - name: Gather facts about installed packages
+      ansible.builtin.package_facts:
+
+    - name: Swap minimal-curl to curl
+      ansible.builtin.shell: | 
+        yes | sudo dnf swap curl-minimal curl
+      when: "'curl-minimal' in ansible_facts.packages"
+        
     - name: Install dependencies
       ansible.builtin.yum:
         name:
