@@ -1,33 +1,44 @@
-# Домашнее задание к занятию 2 «Использование Ansible» - Сергей Михалёв
+Домашнее задание к занятию 4 «Работа с roles» - Михалёв Сергей
+Подготовка к выполнению
 
+        Необязательно. Познакомьтесь с LightHouse.
+    Создайте два пустых публичных репозитория в любом своём проекте: vector-role и lighthouse-role.
+    Добавьте публичную часть своего ключа к своему профилю на GitHub.
 
+Основная часть
 
-## Основная часть
+Ваша цель — разбить ваш playbook на отдельные roles.
 
-1. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает LightHouse.
-2. При создании tasks рекомендую использовать модули: `get_url`, `template`, `yum`, `apt`.
-3. Tasks должны: скачать статику LightHouse, установить Nginx или любой другой веб-сервер, настроить его конфиг для открытия LightHouse, запустить веб-сервер.
-4. Подготовьте свой inventory-файл `prod.yml`.
-5. Запустите `ansible-lint site.yml` и исправьте ошибки, если они есть.
-6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
-7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
-8. Повторно запустите playbook с флагом `--diff` и убедитесь, что playbook идемпотентен.
-9. Подготовьте README.md-файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
-10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-03-yandex` на фиксирующий коммит, в ответ предоставьте ссылку на него.
+Задача — сделать roles для ClickHouse, Vector и LightHouse и написать playbook для использования этих ролей.
 
----
+Ожидаемый результат — существуют три ваших репозитория: два с roles и один с playbook.
 
-### Решение
+Что нужно сделать
 
-1. Резальтат поиска ошибо к при помощи `ansible-lint site.yml`
-     <img src="images/Task_lint.png" alt="Task_lint.png" width="700" height="auto">
-2. Результат запуска `ansible-playbook site.yml -i inventory/prod.yml --check`
-   <img src="images/Task_check_1.png" alt="Task_check_1.png" width="700" height="auto">
-3. Результат запуска `ansible-playbook site.yml -i inventory/prod.yml --diff`
-   <img src="images/Task_diff.png" alt="Task_diff.png" width="700" height="auto">
-4. Результат повторного запуска `ansible-playbook site.yml -i inventory/prod.yml --diff`
-   <img src="images/Task_check_2.png" alt="Task_check_2.png" width="700" height="auto">
-4. Ссылка на обновлённый [README.md](https://github.com/sergeMMikh/hw_ansible_02/blob/main/playbook/README.md) playbook.
-5. Ссылка на [tag `08-ansible-03-yandex`](https://github.com/sergeMMikh/hw_ansible_02/releases/tag/08-ansible-03-yandex)
+    Создайте в старой версии playbook файл requirements.yml и заполните его содержимым:
 
----
+    ---
+      - src: git@github.com:AlexeySetevoi/ansible-clickhouse.git
+        scm: git
+        version: "1.13"
+        name: clickhouse 
+
+При помощи ansible-galaxy скачайте себе эту роль.
+
+Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role.
+
+На основе tasks из старого playbook заполните новую role. Разнесите переменные между vars и default.
+
+Перенести нужные шаблоны конфигов в templates.
+
+Опишите в README.md обе роли и их параметры. Пример качественной документации ansible role по ссылке.
+
+Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
+
+Выложите все roles в репозитории. Проставьте теги, используя семантическую нумерацию. Добавьте roles в requirements.yml в playbook.
+
+Переработайте playbook на использование roles. Не забудьте про зависимости LightHouse и возможности совмещения roles с tasks.
+
+Выложите playbook в репозиторий.
+
+В ответе дайте ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
