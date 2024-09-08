@@ -27,6 +27,7 @@
    <img src="images/Task_diff.png" alt="Task_diff.png" width="700" height="auto">
 4. Результат повторного запуска `ansible-playbook site.yml -i inventory/prod.yml --diff`
    <img src="images/Task_check_2.png" alt="Task_check_2.png" width="700" height="auto">
-5. ссылка на [tag `08-ansible-03-yandex`](https://github.com/sergeMMikh/hw_ansible_02/releases/tag/08-ansible-03-yandex)
+4. Ссылка на обновлённый [README.md](https://github.com/sergeMMikh/hw_ansible_02/blob/main/playbook/README.md) playbook.
+5. Ссылка на [tag `08-ansible-03-yandex`](https://github.com/sergeMMikh/hw_ansible_02/releases/tag/08-ansible-03-yandex)
 
 ---

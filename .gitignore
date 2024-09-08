@@ -6,6 +6,10 @@
 *~
 
 *.pem
+*/roles/
+playbook/roles/
+
+
 
 # Vagrant stuff
 acceptance_config.yml
