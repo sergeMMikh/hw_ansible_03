@@ -1,49 +1,8 @@
 ---
 - name: Install Clickhouse
   hosts: clickhouse
-  become: true
-  vars_files:
-    - vars.yml
-  handlers:
-    - name: Start clickhouse service
-      ansible.builtin.service:
-        name: clickhouse-server
-        state: restarted
-  tasks:
-    - name: Download Clickhouse packages
-      block:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
-            dest: "{{ pacages_path }}/{{ item }}-{{ clickhouse_version }}.rpm"
-            mode: "0644"
-          with_items: "{{ clickhouse_packages }}"
-      rescue:
-        - name: Get clickhouse distrib (rescue mode)
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
-            dest: "{{ pacages_path }}/clickhouse-common-static-{{ clickhouse_version }}.rpm"
-            mode: "0644"
-
-    - debug:
-        var: rpm_files.stdout_lines
-
-    - name: Install clickhouse packages
-      ansible.builtin.yum:
-        name: "{{ pacages_path }}/{{ item }}-{{ clickhouse_version }}.rpm"
-        disable_gpg_check: true
-      loop:
-        - clickhouse-common-static
-        - clickhouse-client
-        - clickhouse-server
-      notify: Start clickhouse service
-    - name: Flush handlers
-      ansible.builtin.meta: flush_handlers
-    - name: Create Clickhouse database
-      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
-      register: create_db
-      failed_when: create_db.rc != 0 and create_db.rc != 82
-      changed_when: create_db.rc == 0
+  roles:
+    - clichouse
 
 - name: Install Vector
   hosts: vector

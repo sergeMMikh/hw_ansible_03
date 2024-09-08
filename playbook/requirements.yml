@@ -1,0 +1,5 @@
+---
+- name: clichouse
+  src: https://github.com/sergeMMikh/role-clickhouse.git
+  scm: git
+  # version: 1.0.0
